@@ -5,7 +5,7 @@
   - name: Generate local SSH config
     template:
       src: ssh_cfg.j2
-      dest: ./ssh.cfg
+      dest: ssh.cfg
       mode: 0600
 
 - hosts: jumpbox

@@ -5,10 +5,12 @@
 ###########################################################################
 timeout=60
 ansible_become=yes
-ansible_ssh_common_args="-o StrictHostKeyChecking=no -F ssh.cfg"
 
 [ospcloud:children]
 jumpbox
 
 [jumpbox]
-workstation-07ec.rhpds.opentlc.com
+workstation-{{ GUID }}.rhpds.opentlc.com
+
+[jumpbox:vars]
+ansible_ssh_common_args='-o ForwardAgent=yes -o ControlMaster=auto -o ControlPath="/tmp/%h-%r" -o ControlPersist="5m" -o StrictHostKeyChecking=no'

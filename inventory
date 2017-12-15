@@ -1,8 +1,5 @@
 [ospcloud:vars]
 timeout=60
-ansible_become=yes
-ansible_ssh_user=cloud-user
-ansible_ssh_private_key_file="openstack.pem"
 
 [ospcloud:children]
 jumpbox

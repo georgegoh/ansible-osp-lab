@@ -11,4 +11,4 @@ ansible_ssh_common_args="-o StrictHostKeyChecking=no -F ssh.cfg"
 jumpbox
 
 [jumpbox]
-workstation-4817.rhpds.opentlc.com
+workstation-07ec.rhpds.opentlc.com

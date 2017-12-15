@@ -1,0 +1,24 @@
+---
+- name: set up yum repo
+  hosts: all:!windows
+  become: yes
+  tasks:
+  - template:
+      src: ./open_three-tier-app.repo
+      dest: /etc/yum.repos.d/open_three-tier-app.repo
+      mode: 0644
+
+- hosts: frontends
+  become: yes
+  roles:
+    - role: frontend
+
+- hosts: apps
+  become: yes
+  roles:
+    - role: app
+
+- hosts: appdbs
+  become: yes
+  roles:
+    - role: geerlingguy.postgresql

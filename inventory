@@ -1,0 +1,14 @@
+[ospcloud:vars]
+
+###########################################################################
+### Ansible Vars
+###########################################################################
+timeout=60
+ansible_become=yes
+ansible_ssh_common_args="-o StrictHostKeyChecking=no -F ssh.cfg"
+
+[ospcloud:children]
+jumpbox
+
+[jumpbox]
+workstation-{{ GUID }}.rhpds.opentlc.com

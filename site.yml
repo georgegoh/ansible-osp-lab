@@ -1,0 +1,103 @@
+---
+- name: Set up networking
+  hosts: jumpbox
+  tasks:
+  - name: Print hostvars
+    debug:
+      var: hostvars[inventory_hostname]
+      verbosity: 4
+  - name: Gather facts about previously created networks
+    os_networks_facts:
+      cloud: "{{ cloud }}"
+  - name: Show openstack networks
+    debug:
+      var: openstack_networks
+  - name: Gather facts about previously created subnets
+    os_subnets_facts:
+      cloud: "{{ cloud }}"
+  - name: Show openstack subnets
+    debug:
+      var: openstack_subnets
+  - name: Create public network
+    os_network:
+      state: present
+      cloud: "{{ cloud }}"
+      name: "{{ public_network_name }}"
+      shared: true
+      external: true
+  - name: Create public subnet
+    os_subnet:
+      state: present
+      cloud: "{{ cloud }}"
+      network_name: "{{ public_network_name }}"
+      name: "{{ public_subnet_name }}"
+      cidr: "{{ public_subnet_cidr }}"
+      dns_nameservers: "{{ public_dns_nameservers }}"
+      host_routes: "{{ public_host_routes }}"
+  - name: Create private network
+    os_network:
+      state: present
+      cloud: "{{ cloud }}"
+      name: "{{ private_network_name }}"
+      external: false
+  - name: Create private subnet
+    os_subnet:
+      state: present
+      cloud: "{{ cloud }}"
+      network_name: "{{ private_network_name }}"
+      name: "{{ private_subnet_name }}"
+      cidr: "{{ private_subnet_cidr }}"
+      dns_nameservers: "{{ private_dns_nameservers }}"
+      host_routes: "{{ private_host_routes }}"
+  - name: Create router between private and public network
+    os_router:
+      state: present
+      name: "{{ router_name }}"
+      cloud: "{{ cloud }}"
+      network: "{{ public_network_name }}"
+      external_fixed_ips: "{{ router_external_fixed_ips }}"
+      interfaces:
+        - "{{ private_subnet_name }}"
+  - name: Gather facts about previously created networks
+    os_networks_facts:
+      cloud: "{{ cloud }}"
+  - name: Show openstack networks
+    debug:
+      var: openstack_networks
+  - name: Gather facts about previously created subnets
+    os_subnets_facts:
+      cloud: "{{ cloud }}"
+  - name: Show openstack subnets
+    debug:
+      var: openstack_subnets
+
+- name: Set up Security Group(s) and Keypair(s)
+  hosts: jumpbox
+  tasks:
+  - name: Create security group(s)
+    os_security_group:
+      cloud: "{{ cloud }}"
+      state: present
+      name: "{{ item.name }}"
+      description: "{{ item.description }}"
+    with_items: "{{ security_groups }}"
+  - name: Add rules to security group(s)
+    os_security_group_rule:
+      cloud: "{{ cloud }}"
+      state: present
+      security_group: "{{ item.0.name }}"
+      protocol: "{{ item.1.protocol }}"
+      port_range_min: "{{ item.1.port_range_min }}"
+      port_range_max: "{{ item.1.port_range_max }}"
+      remote_ip_prefix: "{{ item.1.remote_ip_prefix | default('0.0.0.0/0') }}"
+    with_subelements:
+      - "{{ security_groups }}"
+      - rules
+  - name: Set up Keypair(s)
+    os_keypair:
+      cloud: "{{ cloud }}"
+      state: present
+      name: "{{ item.name }}"
+      public_key: "{{ item.public_key | default(None) }}"
+    with_items:
+      - "{{ keypairs }}"

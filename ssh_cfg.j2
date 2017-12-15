@@ -1,0 +1,16 @@
+Host jumpbox
+  Hostname workstation-{{ GUID }}.rhpds.opentlc.com
+  User cloud-user
+  IdentityFile openstack.pem
+  ForwardAgent yes
+  ControlMaster auto
+  ControlPath /tmp/%h-%r
+  ControlPersist 5m
+  StrictHostKeyChecking no
+
+Host 10.10.10.*
+  User cloud-user
+  IdentityFile openstack.pem
+  ProxyCommand ssh -F ssh.cfg jumpbox -W %h:%p -vvv
+  StrictHostKeyChecking no
+

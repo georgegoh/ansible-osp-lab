@@ -1,3 +1,13 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Generate local SSH config
+    template:
+      src: ssh_cfg.j2
+      dest: ./ssh.cfg
+      mode: 0600
+
 - hosts: jumpbox
   gather_facts: false
   vars:
